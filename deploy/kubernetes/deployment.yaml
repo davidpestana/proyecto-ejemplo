@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ejemplo
+  labels:
+    stack: node-express
+    app: ejemplo
+    project: romeo
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      app: ejemplo
+      project: romeo
+  template:
+    metadata:
+      labels:
+        stack: node-express
+        app: ejemplo
+        project: romeo
+    spec:
+      containers:
+      - name: api
+        image: ghcr.io/davidpestana/proyecto-ejemplo:v1.0.0
+        envFrom:
+          - secretRef: 
+              name: hippo-pguser-hippo
+            prefix: postgres_
+        env:
+          - name: POSTGRES_HOST
+            valueFrom:
+              secretKeyRef: {name: hippo-pguser-hippo, key: host }
+        #   - name: KAFKA_HOST
+        #     value: kakfa-service.kafka:9092
+        ports:
+        - containerPort: 5000
+        resources:
+          requests:
+            memory: "100M"
+            cpu: "100m"
+          limits:
+            memory: "200M"
+            cpu: "500m"
